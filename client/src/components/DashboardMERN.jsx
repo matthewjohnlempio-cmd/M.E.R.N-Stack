@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ProductModal from "../components/ProductModal";
-import Pagination from "../components/Pagination";
+import ProductModal from "./ProductModal";
+import Pagination from "./Pagination";
+import Footer from "./Footer";
 import axios from "axios";
 
 export default function Dashboard() {
@@ -128,103 +129,107 @@ export default function Dashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    navigate("/");
+    navigate("/login/mern");
   };
 
   return (
-    <div className="min-h-screen bg-[#1e1e1e] text-white p-6 animate-fade-in font-sans">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-teal-400">Dashboard</h1>
-          <p className="text-slate-400">Welcome back, {currentUser?.name}</p>
-        </div>
+    <div className="min-h-screen bg-[#1e1e1e] text-white animate-fade-in font-sans flex flex-col">
+      <div className="flex-1 max-w-7xl w-full mx-auto px-6 py-6">
 
-        <button
-          onClick={handleLogout}
-          className="px-4 py-2 rounded-xl bg-red-700 hover:bg-red-600 transition font-semibold"
-        >
-          Logout
-        </button>
-      </div>
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-teal-400">Dashboard</h1>
+            <p className="text-slate-400">Welcome back, {currentUser?.name}</p>
+          </div>
 
-      {/* Products Table */}
-      <div className="bg-[#2a2a2a] rounded-2xl shadow-lg p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-teal-300">Products</h2>
           <button
-            onClick={() => setShowModal(true)}
-            className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 transition font-medium"
+            onClick={handleLogout}
+            className="px-4 py-2 rounded-xl bg-red-700 hover:bg-red-600 transition font-semibold"
           >
-            + Add Product
+            Logout
           </button>
         </div>
 
-        {loading ? (
-          <div className="flex justify-center py-10">
-            <div className="w-10 h-10 border-4 border-teal-400 border-t-transparent rounded-full animate-spin" />
+        {/* Products Table */}
+        <div className="bg-[#2a2a2a] rounded-2xl shadow-lg p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-teal-300">Products</h2>
+            <button
+              onClick={() => setShowModal(true)}
+              className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 transition font-medium"
+            >
+              + Add Product
+            </button>
           </div>
-        ) : paginatedProducts.length === 0 ? (
-          <p className="text-slate-400">No products available.</p>
-        ) : (
-          <>
-            <div className="overflow-x-auto rounded-lg border border-[#3a3a3a]">
-              <table className="w-full border-collapse text-sm">
-                <thead>
-                  <tr className="text-left text-slate-400 border-b border-[#3a3a3a]">
-                    <th className="py-3 px-4">Name</th>
-                    <th className="px-4">SKU</th>
-                    <th className="px-4">Category</th>
-                    <th className="px-4">Price</th>
-                    <th className="px-4">Stock</th>
-                    <th className="text-right px-4">Actions</th>
-                  </tr>
-                </thead>
 
-                <tbody>
-                  {paginatedProducts.map((product, i) => (
-                    <tr
-                      key={product.id}
-                      className="border-b border-[#3a3a3a] hover:bg-[#333333] transition"
-                      style={{
-                        animation: `rowFade 0.3s ease ${i * 0.05}s both`,
-                      }}
-                    >
-                      <td className="py-3 px-4">{product.name}</td>
-                      <td className="px-4">{product.sku}</td>
-                      <td className="px-4">{product.category}</td>
-                      <td className="px-4 text-teal-400">₱{product.price}</td>
-                      <td className="px-4">{product.stock}</td>
-                      <td className="text-right space-x-2 px-4">
-                        <button
-                          onClick={() => handleEdit(product)}
-                          className="px-3 py-1 rounded-lg bg-teal-600 hover:bg-teal-500 transition text-sm"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(product.id)}
-                          className="px-3 py-1 rounded-lg bg-red-700 hover:bg-red-600 transition text-sm"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {loading ? (
+            <div className="flex justify-center py-10">
+              <div className="w-10 h-10 border-4 border-teal-400 border-t-transparent rounded-full animate-spin" />
             </div>
+          ) : paginatedProducts.length === 0 ? (
+            <p className="text-slate-400">No products available.</p>
+          ) : (
+            <>
+              <div className="overflow-x-auto rounded-lg border border-[#3a3a3a]">
+                <table className="w-full border-collapse text-sm">
+                  <thead>
+                    <tr className="text-left text-slate-400 border-b border-[#3a3a3a]">
+                      <th className="py-3 px-4">Name</th>
+                      <th className="px-4">SKU</th>
+                      <th className="px-4">Category</th>
+                      <th className="px-4">Price</th>
+                      <th className="px-4">Stock</th>
+                      <th className="text-right px-4">Actions</th>
+                    </tr>
+                  </thead>
 
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-              rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={handleRowsPerPageChange}
-            />
-          </>
-        )}
+                  <tbody>
+                    {paginatedProducts.map((product, i) => (
+                      <tr
+                        key={product.id}
+                        className="border-b border-[#3a3a3a] hover:bg-[#333333] transition"
+                        style={{
+                          animation: `rowFade 0.3s ease ${i * 0.05}s both`,
+                        }}
+                      >
+                        <td className="py-3 px-4">{product.name}</td>
+                        <td className="px-4">{product.sku}</td>
+                        <td className="px-4">{product.category}</td>
+                        <td className="px-4 text-teal-400">₱{product.price}</td>
+                        <td className="px-4">{product.stock}</td>
+                        <td className="text-right space-x-2 px-4">
+                          <button
+                            onClick={() => handleEdit(product)}
+                            className="px-3 py-1 rounded-lg bg-teal-600 hover:bg-teal-500 transition text-sm"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(product.id)}
+                            className="px-3 py-1 rounded-lg bg-red-700 hover:bg-red-600 transition text-sm"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleRowsPerPageChange}
+              />
+            </>
+          )}
+        </div>
       </div>
+      <Footer />
 
       {/* Modal */}
       <ProductModal
@@ -235,7 +240,7 @@ export default function Dashboard() {
         setForm={setForm}
         isEditing={!!editingId}
       />
-
+      
       {/* Styles */}
       <style>
         {`
@@ -263,6 +268,7 @@ export default function Dashboard() {
           }
         `}
       </style>
+      
     </div>
   );
 }

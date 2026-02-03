@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { api } from "../api";
+import { firebaseAuth } from "../firebase"; // Firebase Auth import
+import { signInWithEmailAndPassword } from "firebase/auth";
 
-export default function Login() {
+export default function LoginFirebase() {
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -23,14 +24,35 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // Updated route to match backend
-      const res = await api.post("/users/login", form);
+      // Firebase login
+      const userCredential = await signInWithEmailAndPassword(
+        firebaseAuth,
+        form.email,
+        form.password
+      );
 
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      // Save user info in localStorage
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          uid: userCredential.user.uid,
+          email: userCredential.user.email,
+        })
+      );
 
-      navigate("/dashboard");
+      alert("Login successful!");
+      navigate("/dashboard/firebase"); // Redirect after login
     } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
+      // Firebase error handling
+      if (err.code === "auth/user-not-found") {
+        alert("No account found with this email.");
+      } else if (err.code === "auth/wrong-password") {
+        alert("Incorrect password. Try again.");
+      } else if (err.code === "auth/invalid-email") {
+        alert("Invalid email format.");
+      } else {
+        alert(err.message || "Login failed");
+      }
     } finally {
       setLoading(false);
     }
@@ -48,9 +70,7 @@ export default function Login() {
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-sm text-slate-300 mb-1">
-              Email
-            </label>
+            <label className="block text-sm text-slate-300 mb-1">Email</label>
             <input
               type="email"
               name="email"
@@ -63,15 +83,14 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="block text-sm text-slate-300 mb-1">
-              Password
-            </label>
+            <label className="block text-sm text-slate-300 mb-1">Password</label>
             <input
               type="password"
               name="password"
               value={form.password}
               onChange={handleChange}
               required
+              minLength={6}
               className="w-full rounded-xl bg-slate-800 text-white px-4 py-3 outline-none ring-1 ring-slate-700 focus:ring-2 focus:ring-indigo-500 transition"
               placeholder="••••••••"
             />
@@ -96,7 +115,7 @@ export default function Login() {
         <p className="text-center text-slate-400 text-sm mt-6">
           Don’t have an account?{" "}
           <button
-            onClick={() => navigate("/register")}
+            onClick={() => navigate("/register/firebase")}
             className="text-indigo-400 hover:text-indigo-300 font-medium transition"
           >
             Register
@@ -107,18 +126,10 @@ export default function Login() {
       <style>
         {`
           @keyframes fade-in {
-            from {
-              opacity: 0;
-              transform: translateY(12px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
           }
-          .animate-fade-in {
-            animation: fade-in 0.5s ease-out;
-          }
+          .animate-fade-in { animation: fade-in 0.5s ease-out; }
         `}
       </style>
     </div>

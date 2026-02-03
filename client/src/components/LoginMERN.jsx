@@ -2,11 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 
-export default function Register() {
+export default function Login() {
   const [form, setForm] = useState({
-    name: "",
     email: "",
-    address: "",
     password: "",
   });
 
@@ -20,46 +18,35 @@ export default function Register() {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
       // Updated route to match backend
-      await api.post("/users", form);
-      navigate("/");
+      const res = await api.post("/users/login", form);
+
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+
+      navigate("/dashboard/mern");
     } catch (err) {
-      alert(err.response?.data?.message || "Registration failed");
+      alert(err.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 px-4">
       <div className="w-full max-w-md bg-slate-900/80 backdrop-blur rounded-2xl shadow-xl p-8 animate-fade-in">
         <h2 className="text-3xl font-bold text-white text-center mb-2">
-          Create an account
+          Welcome back
         </h2>
         <p className="text-slate-400 text-center mb-6">
-          Join us and get started
+          Log in to your account
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm text-slate-300 mb-1">
-              Full name
-            </label>
-            <input
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              required
-              className="w-full rounded-xl bg-slate-800 text-white px-4 py-3 outline-none ring-1 ring-slate-700 focus:ring-2 focus:ring-indigo-500 transition"
-              placeholder="Enter your name"
-            />
-          </div>
-
+        <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-sm text-slate-300 mb-1">
               Email
@@ -77,20 +64,6 @@ export default function Register() {
 
           <div>
             <label className="block text-sm text-slate-300 mb-1">
-              Address
-            </label>
-            <input
-              name="address"
-              value={form.address}
-              onChange={handleChange}
-              required
-              className="w-full rounded-xl bg-slate-800 text-white px-4 py-3 outline-none ring-1 ring-slate-700 focus:ring-2 focus:ring-indigo-500 transition"
-              placeholder="City, Country"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm text-slate-300 mb-1">
               Password
             </label>
             <input
@@ -99,9 +72,8 @@ export default function Register() {
               value={form.password}
               onChange={handleChange}
               required
-              minLength={6}
               className="w-full rounded-xl bg-slate-800 text-white px-4 py-3 outline-none ring-1 ring-slate-700 focus:ring-2 focus:ring-indigo-500 transition"
-              placeholder="Minimum 6 characters"
+              placeholder="••••••••"
             />
           </div>
 
@@ -113,21 +85,21 @@ export default function Register() {
             {loading ? (
               <span className="flex items-center gap-2">
                 <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Creating account…
+                Logging in…
               </span>
             ) : (
-              "Register"
+              "Login"
             )}
           </button>
         </form>
 
         <p className="text-center text-slate-400 text-sm mt-6">
-          Already have an account?{" "}
+          Don’t have an account?{" "}
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/register/mern")}
             className="text-indigo-400 hover:text-indigo-300 font-medium transition"
           >
-            Login
+            Register
           </button>
         </p>
       </div>
